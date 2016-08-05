@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'underscore';
+import reqwest from 'reqwest';
 
 class Temperature extends React.Component {
   constructor(props, context) {
@@ -12,11 +13,11 @@ class Temperature extends React.Component {
     this.switchUnit = this.switchUnit.bind(this);
   };
 
-  getTemperature(kelvin) {
+  getTemperature(fahrenheit) {
     if (this.state.celsius) {
-      return Number((kelvin - 273.15).toFixed(1)) + " °C";
+      return Number(((fahrenheit - 32) / 1.8).toFixed(1)) + " °C";
     } else {
-      return Number((kelvin * 9/5 - 459.67).toFixed(1)) + " °F";
+      return Number((fahrenheit).toFixed(1)) + " °F";
     }
   };
 
@@ -29,7 +30,7 @@ class Temperature extends React.Component {
 
     return (
       <div>
-        <h1>{this.getTemperature(this.props.kelvin)}</h1>
+        <h1>{this.getTemperature(this.props.fahrenheit)}</h1>
         <button onClick={this.switchUnit}>°C / Fahrenheit</button>
       </div>
     )
@@ -43,50 +44,33 @@ class Weather extends React.Component {
     this.state = {
       temp: undefined,
       main: '',
-      description: '',
       icon: '',
-      country: '',
       city: ''
     };
   };
 
   getWeather() {
-    const request = new XMLHttpRequest();
+    
     const url = [
-      'http://api.openweathermap.org/data/2.5/weather?lat=',
+      'https://api.forecast.io/forecast/de40f00fe24e6e53fcae302b0d12efe9/',
       this.props.lat,
-      '&lon=',
-      this.props.lon,
-      '&appid=58198c11fcda885e9caae8a689461910'
+      ',',
+      this.props.lon
     ].join('');
-
-    request.open('GET', url, true);
-
-    request.onload = () => {
-      if (request.status >= 200 && request.status < 400) {
-        // Success!
-        const weather = JSON.parse(request.responseText);
+    
+    reqwest({
+      url: url,
+      type: 'jsonp',
+      success: (weather) => {
         this.setState({
-          temp: weather.main.temp,
-          main: weather.weather["0"].main,
-          description: weather.weather["0"].description,
-          icon: ['http://openweathermap.org/img/w/', weather.weather["0"].icon, '.png'].join(''),
-          country: weather.sys.country,
-          city: weather.name,
+          temp: weather.currently.temperature,
+          main: weather.currently.summary,
+          //icon: ['http://openweathermap.org/img/w/', weather.currently.icon, '.png'].join('')
+          city: weather.timezone,
         });
-      } else {
-        // We reached our target server, but it returned an error
-
       }
-    };
-
-    request.onerror = function() {
-      // There was a connection error of some sort
-    };
-
-    request.send();
+    });
   };
-
 
   componentDidUpdate(prevProps) {
     if (!_.isEqual(prevProps, {lat: this.props.lat, lon: this.props.lon})) {
@@ -102,10 +86,10 @@ class Weather extends React.Component {
     if (this.state.temp) {
       return (
         <div>
-          <p>{this.state.city}, {this.state.country}</p>
-          <p>{this.state.main} ({this.state.description})</p>
+          <p>{this.state.city}</p>
+          <p>{this.state.main}</p>
           <p><img src={this.state.icon} alt="Weather icon" /></p>
-          <Temperature kelvin={this.state.temp} />
+          <Temperature fahrenheit={this.state.temp} />
         </div>
       )
     } else {
