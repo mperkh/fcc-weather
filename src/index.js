@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'underscore';
-import reqwest from 'reqwest';
+import $ from 'jquery';
 
 class Temperature extends React.Component {
   constructor(props, context) {
@@ -58,9 +58,9 @@ class Weather extends React.Component {
       this.props.lon
     ].join('');
     
-    reqwest({
+    $.ajax({
       url: url,
-      type: 'jsonp',
+      dataType: 'jsonp',
       success: (weather) => {
         this.setState({
           temp: weather.currently.temperature,
