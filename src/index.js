@@ -2,6 +2,38 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'underscore';
 import $ from 'jquery';
+import './index.css'
+
+class WeatherIcon extends React.Component {
+  getApiIcon (icon) {
+    const icons = {
+      'day-sunny': 'wi wi-forecast-io-clear-day',
+      'night-clear': 'wi wi-forecast-io-clear-night',
+      'rain': 'wi wi-forecast-io-rain',
+      'snow': 'wi wi-forecast-io-snow',
+      'sleet': 'wi wi-forecast-io-sleet',
+      'strong-wind': 'wi wi-forecast-io-wind',
+      'fog': 'wi wi-forecast-io-fog',
+      'cloudy': 'wi wi-forecast-io-cloudy',
+      'day-cloudy': 'wi wi-forecast-io-partly-cloudy-day',
+      'night-cloudy': 'wi wi-forecast-io-partly-cloudy-night',
+      'hail': 'wi wi-forecast-io-hail',
+      'thunderstorm': 'wi wi-forecast-io-thunderstorm',
+      'tornado': 'wi wi-forecast-io-tornado',
+    };
+    return icons[icon];
+  };
+
+  render() {
+    return (
+        <i className={this.getApiIcon(this.props.icon)}></i>
+    )
+  };
+}
+
+WeatherIcon.propTypes = {
+  icon: React.PropTypes.string
+};
 
 class Temperature extends React.Component {
   constructor(props, context) {
@@ -27,7 +59,6 @@ class Temperature extends React.Component {
   };
 
   render() {
-
     return (
       <div>
         <h1>{this.getTemperature(this.props.fahrenheit)}</h1>
@@ -65,7 +96,7 @@ class Weather extends React.Component {
         this.setState({
           temp: weather.currently.temperature,
           main: weather.currently.summary,
-          //icon: ['http://openweathermap.org/img/w/', weather.currently.icon, '.png'].join('')
+          icon: weather.currently.icon,
           city: weather.timezone,
         });
       }
@@ -88,7 +119,7 @@ class Weather extends React.Component {
         <div>
           <p>{this.state.city}</p>
           <p>{this.state.main}</p>
-          <p><img src={this.state.icon} alt="Weather icon" /></p>
+          <p><WeatherIcon icon={this.state.icon} /></p>
           <Temperature fahrenheit={this.state.temp} />
         </div>
       )
