@@ -7,12 +7,14 @@ import './index.css'
 class Map extends React.Component {
   render() {
     return (
-      <img src={"https://maps.google.com/maps/api/staticmap?markers=" +
-        this.props.lat +
-        "," +
-        this.props.lon +
-        "&maptype=terrain&size=400x300&scale=2"}
-        alt="Map location" width="400" height="300"/>
+      <div>
+        <img src={"https://maps.google.com/maps/api/staticmap?markers=" +
+          this.props.lat +
+          "," +
+          this.props.lon +
+          "&maptype=terrain&size=400x300&scale=2"}
+          alt="Map location" width="400" height="300"/>
+      </div>
     )
   };
 };
@@ -43,9 +45,10 @@ class WeatherIcon extends React.Component {
   };
 
   render() {
-    console.log(this.props.icon);
     return (
+      <div>
         <i className={this.getApiIcon(this.props.icon)}></i>
+      </div>
     )
   };
 }
@@ -134,8 +137,11 @@ class Weather extends React.Component {
     if (this.state.temp) {
       return (
         <div>
-          <p><Map lat={this.props.lat} lon={this.props.lon} /></p>
-          <p><WeatherIcon icon={this.state.icon} /></p>
+          <Map lat={this.props.lat} lon={this.props.lon} />
+          <WeatherIcon icon={this.state.icon} />
+          <div>
+            {this.state.main}
+          </div>
           <Temperature fahrenheit={this.state.temp} />
         </div>
       )
