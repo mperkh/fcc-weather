@@ -6,17 +6,29 @@ import './index.css'
 import { Grid } from 'react-bootstrap';
 import { Row } from 'react-bootstrap';
 import { Col } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import { Image } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
+
+/*
+const Grid = ReactBootstrap.Grid;
+const Row = ReactBootstrap.Row;
+const Col = ReactBootstrap.Col;
+const Button = ReactBootstrap.Button;
+const Image = ReactBootstrap.Image;
+const Panel = ReactBootstrap.Panel;
+*/
 
 class Map extends React.Component {
   render() {
     return (
-      <div>
-        <img src={"https://maps.google.com/maps/api/staticmap?markers=" +
+      <div id="map">
+        <Image src={"https://maps.google.com/maps/api/staticmap?markers=" +
           this.props.lat +
           "," +
           this.props.lon +
           "&maptype=terrain&size=400x300&scale=2"}
-          alt="Map location" width="400" height="300"/>
+          alt="Map location" responsive />
       </div>
     )
   };
@@ -49,7 +61,7 @@ class WeatherIcon extends React.Component {
 
   render() {
     return (
-      <div>
+      <div id="weather-icon">
         <i className={this.getApiIcon(this.props.icon)}></i>
       </div>
     )
@@ -85,9 +97,9 @@ class Temperature extends React.Component {
 
   render() {
     return (
-      <div>
+      <div id="temperature">
         <h1>{this.getTemperature(this.props.fahrenheit)}</h1>
-        <button onClick={this.switchUnit}>°C / Fahrenheit</button>
+        <Button onClick={this.switchUnit} bsStyle="primary">°C / Fahrenheit</Button>
       </div>
     )
   };
@@ -139,14 +151,16 @@ class Weather extends React.Component {
   render() {
     if (this.state.temp) {
       return (
-        <div>
-          <Map lat={this.props.lat} lon={this.props.lon} />
-          <WeatherIcon icon={this.state.icon} />
-          <div>
-            {this.state.main}
+        <Panel header="Show the Local Weather" bsStyle="primary">
+          <div className="text-center">
+            <Map lat={this.props.lat} lon={this.props.lon} />
+            <WeatherIcon icon={this.state.icon} />
+            <p className="lead">
+              {this.state.main}
+            </p>
+            <Temperature fahrenheit={this.state.temp} />
           </div>
-          <Temperature fahrenheit={this.state.temp} />
-        </div>
+        </Panel>
       )
     } else {
       return (
@@ -192,7 +206,7 @@ class App extends React.Component {
       return (
         <Grid>
           <Row className="show-grid">
-            <Col xs={12} md={4} mdOffset={4}>
+            <Col xs={6} xsOffset={3}>
               <Weather lat={this.state.lat} lon={this.state.lon} />
             </Col>
           </Row>
