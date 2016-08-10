@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import _ from 'underscore';
 import $ from 'jquery';
 import './index.css'
+import { Grid } from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 
 class Map extends React.Component {
   render() {
@@ -187,9 +190,13 @@ class App extends React.Component {
   render() {
     if (this.state.lon && this.state.lat) {
       return (
-        <div>
-          <Weather lat={this.state.lat} lon={this.state.lon} />
-        </div>
+        <Grid>
+          <Row className="show-grid">
+            <Col xs={12} md={4} mdOffset={4}>
+              <Weather lat={this.state.lat} lon={this.state.lon} />
+            </Col>
+          </Row>
+        </Grid>
       )
     } else {
       return (
