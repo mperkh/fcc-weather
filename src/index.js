@@ -9,14 +9,17 @@ import { Col } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import { Image } from 'react-bootstrap';
 import { Panel } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 
 /*
+// Include React Bootstrap Components for Codepen
 const Grid = ReactBootstrap.Grid;
 const Row = ReactBootstrap.Row;
 const Col = ReactBootstrap.Col;
 const Button = ReactBootstrap.Button;
 const Image = ReactBootstrap.Image;
 const Panel = ReactBootstrap.Panel;
+const Alert = ReactBootstrap.Alert;
 */
 
 class Map extends React.Component {
@@ -110,9 +113,10 @@ class Weather extends React.Component {
     super(props, context);
 
     this.state = {
+      error: undefined,
       temp: undefined,
-      main: '',
-      icon: '',
+      main: undefined,
+      icon: undefined,
     };
   };
 
@@ -129,10 +133,22 @@ class Weather extends React.Component {
       url: url,
       dataType: 'jsonp',
       success: (weather) => {
+        const w = weather.currently;
+        if (w.temperature && w.summary && w.icon) {
+          this.setState({
+            temp: w.temperature,
+            main: w.summary,
+            icon: w.icon,
+          });
+        } else {
+          this.setState({
+            error: true
+          });
+        }
+      },
+      error: () => {
         this.setState({
-          temp: weather.currently.temperature,
-          main: weather.currently.summary,
-          icon: weather.currently.icon,
+          error: true
         });
       }
     });
@@ -149,8 +165,11 @@ class Weather extends React.Component {
   };
 
   render() {
-    if (this.state.temp) {
-      return (
+
+    let fetchStatus;
+
+    if (!this.state.error && this.state.temp && this.state.main && this.state.icon) {
+      fetchStatus = (
         <Panel header="Show the Local Weather" bsStyle="primary">
           <div className="text-center">
             <Map lat={this.props.lat} lon={this.props.lon} />
@@ -161,12 +180,26 @@ class Weather extends React.Component {
             <Temperature fahrenheit={this.state.temp} />
           </div>
         </Panel>
-      )
+      );
+    } else if (this.state.error) {
+      fetchStatus = (
+        <Alert bsStyle="danger">
+          <strong>Status:</strong> Unable to get weather data.
+        </Alert>
+      );
     } else {
-      return (
-        <p>Getting weather data...</p>
-      )
+      fetchStatus = (
+        <Alert bsStyle="info">
+          <strong>Status:</strong> Getting weather data...
+        </Alert>
+      );
     }
+
+    return (
+      <div id="weather">
+        {fetchStatus}
+      </div>
+    )
   }
 };
 
@@ -186,38 +219,63 @@ class App extends React.Component {
 
     this.state = {
       lat: undefined,
-      lon: undefined
+      lon: undefined,
+      status: undefined
     };
   };
 
   componentDidMount() {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(position => {
-        this.setState({
-          lat: position.coords.latitude,
-          lon: position.coords.longitude
-        });
-      });
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          this.setState({
+            status: 'success',
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          });
+        },
+        error => {
+          this.setState({
+            status: 'error'
+          });
+        }
+      );
     }
   };
 
   render() {
-    if (this.state.lon && this.state.lat) {
-      return (
-        <Grid>
-          <Row className="show-grid">
-            <Col xs={6} xsOffset={3}>
-              <Weather lat={this.state.lat} lon={this.state.lon} />
-            </Col>
-          </Row>
-        </Grid>
-      )
-    } else {
-      return (
-        <p>Getting location data...</p>
-      )
+
+    let appSwitch;
+
+    switch (this.state.status) {
+      case 'success':
+        appSwitch = <Weather lat={this.state.lat} lon={this.state.lon} />;
+        break;
+      case 'error':
+        appSwitch = (
+          <Alert bsStyle="danger">
+            <strong>Status:</strong> Unable to determine location.
+          </Alert>
+        );
+        break;
+      default:
+        appSwitch = (
+          <Alert bsStyle="info">
+            <strong>Status:</strong> Getting location data...
+          </Alert>
+        );
     }
-  }
+
+    return (
+      <Grid>
+        <Row className="show-grid">
+          <Col md={6} mdOffset={3}>
+            {appSwitch}
+          </Col>
+        </Row>
+      </Grid>
+    )
+  };
 }
 
 ReactDOM.render(
