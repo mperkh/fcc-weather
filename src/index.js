@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import _ from 'underscore';
-import $ from 'jquery';
+import reqwest from 'reqwest';
 import './index.css'
 import { Grid } from 'react-bootstrap';
 import { Row } from 'react-bootstrap';
@@ -129,9 +129,9 @@ class Weather extends React.Component {
       this.props.lon
     ].join('');
 
-    $.ajax({
+    reqwest({
       url: url,
-      dataType: 'jsonp',
+      type: 'jsonp',
       success: (weather) => {
         const w = weather.currently;
         if (w.temperature && w.summary && w.icon) {
