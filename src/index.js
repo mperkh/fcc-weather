@@ -123,7 +123,7 @@ class Weather extends React.Component {
   getWeather() {
 
     const url = [
-      'https://api.forecast.io/forecast/de40f00fe24e6e53fcae302b0d12efe9/',
+      'https://api.darksky.net/forecast/de40f00fe24e6e53fcae302b0d12efe9/',
       this.props.lat,
       ',',
       this.props.lon
@@ -178,6 +178,8 @@ class Weather extends React.Component {
               {this.state.main}
             </p>
             <Temperature fahrenheit={this.state.temp} />
+            <br />
+            <a href="https://darksky.net/poweredby/" target="_blank">Powered by Dark Sky</a>
           </div>
         </Panel>
       );
